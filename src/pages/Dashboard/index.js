@@ -1,9 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Sidebar from '../../components/molecules/DashboardMenu';
+import Content from '../../components/molecules/DashboardContent';
+import styled from 'styled-components';
+
+
+const AppContainer = styled.div`
+  display: flex;
+`;
 
 const Dashboard = () => {
-  return(
-    <h1>Dashboard</h1>
-  )
+  const [current, setCurrent] = useState('procurar-jogos');
+
+  const handleMenuClick = (e) => {
+    setCurrent(e.key);
+  };
+
+  return (
+    <AppContainer>
+      <Sidebar current={current} onMenuClick={handleMenuClick} />
+      <Content current={current} />
+    </AppContainer>
+  );
 }
 
 export default Dashboard;
