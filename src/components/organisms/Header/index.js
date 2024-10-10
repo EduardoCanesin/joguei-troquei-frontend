@@ -48,7 +48,7 @@ const ProfileMenu = styled(Menu)`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 `;
 
-const AppHeader = () => {
+const AppHeader = ({ onLoginClick }) => {
   const navigate = useNavigate();
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -130,7 +130,7 @@ const AppHeader = () => {
             </>
           ) : (
             <IconButton
-              onClick={() => navigate('/')}
+              onClick={onLoginClick}
               aria-label="Fazer login"
             >
               <LoginOutlined style={{ color: 'white', fontSize: '24px' }} />

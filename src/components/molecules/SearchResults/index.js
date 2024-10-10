@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { List, Typography } from 'antd';
 import { PlusSquareOutlined } from '@ant-design/icons';
-import GameModal from './GameModal'; // Importe o novo componente
+import GameModal from '../GameModal';
 
 const ResultsContainer = styled.div`
   margin-top: 20px;

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Form, Input, Button, message, Typography } from 'antd';
+import { Form, Input, Button, message, Typography, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 
@@ -21,6 +22,10 @@ const ErrorMessage = styled.p`
   margin: 0;
 `;
 
+const ProfileSection = styled.div`
+  margin-bottom: 40px;
+`;
+
 const EditProfile = () => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
 
@@ -31,13 +36,13 @@ const EditProfile = () => {
         if (!response.ok) throw new Error('Erro ao carregar dados do usuário');
         const data = await response.json();
         
-        // Set values to the form fields
         setValue('firstName', data.firstName);
         setValue('lastName', data.lastName);
         setValue('state', data.state);
         setValue('city', data.city);
         setValue('birthDate', data.birthDate);
         setValue('email', data.email);
+        setValue('profileMessage', data.profileMessage);
       } catch (error) {
         message.error(error.message);
       }
@@ -47,13 +52,24 @@ const EditProfile = () => {
   }, [setValue]);
 
   const onSubmit = async (data) => {
+    const formData = new FormData();
+
+    formData.append('firstName', data.firstName);
+    formData.append('lastName', data.lastName);
+    formData.append('state', data.state);
+    formData.append('city', data.city);
+    formData.append('birthDate', data.birthDate);
+    formData.append('email', data.email);
+    formData.append('profileMessage', data.profileMessage);
+
+    if (profileImage) {
+      formData.append('profileImage', profileImage);
+    }
+
     try {
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: formData,
       });
 
       if (!response.ok) throw new Error('Erro ao atualizar o perfil');
@@ -62,6 +78,10 @@ const EditProfile = () => {
     } catch (error) {
       message.error(error.message);
     }
+  };
+
+  const onFileChange = (info) => {
+    setProfileImage(info.file.originFileObj);
   };
 
   const onSubmitPassword = async (data) => {
@@ -92,6 +112,36 @@ const EditProfile = () => {
   return (
     <EditProfileContainer role="form" aria-labelledby="edit-profile-title">
       <Title level={4} id="edit-profile-title">Editar Perfil</Title>
+      <ProfileSection>
+        <Title level={5}>Imagem de Perfil e Mensagem</Title>
+
+        <Form layout="vertical">
+          <Form.Item label="Upload de Imagem de Perfil">
+             <Upload
+              name="profileImage"
+              listType="picture"
+              beforeUpload={() => false}
+              onChange={onFileChange}
+              aria-label="Envie sua imagem de perfil"
+            >
+              <Button icon={<UploadOutlined />}>Escolher Imagem</Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item label="Mensagem Personalizada" required>
+            <Input.TextArea
+              {...register('profileMessage', { required: 'Mensagem é obrigatória' })}
+              aria-invalid={errors.profileMessage ? "true" : "false"}
+              aria-describedby="profileMessageError"
+              rows={4}
+              placeholder="Escreva uma mensagem que aparecerá no seu perfil"
+            />
+            {errors.profileMessage && (
+              <ErrorMessage id="profileMessageError">{errors.profileMessage.message}</ErrorMessage>
+            )}
+          </Form.Item>
+        </Form>
+      </ProfileSection>
       <FormContainer>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item label="Nome" required>

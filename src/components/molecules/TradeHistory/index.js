@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, message } from 'antd';
 import styled from 'styled-components';
-import TradeCard from '../TradeCard';
+import TradeHistoryCard from '../TradeHistoryCard';
 
 const TradeHistoryContainer = styled.div`
   padding: 20px;
@@ -35,7 +35,7 @@ const TradeHistory = () => {
         <Row gutter={16}>
           {trades.map((trade) => (
             <Col span={8} key={trade.id}>
-              <TradeCard trade={trade} />
+              <TradeHistoryCard trade={trade} />
             </Col>
           ))}
         </Row>
