@@ -1,28 +1,49 @@
 import React from 'react';
 import { Button, Checkbox, Form, Input } from 'antd';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Importação para redirecionamento
-
+import { createToken } from '../../../services/actions/token';
+import { useNavigate } from 'react-router-dom';
+import { getUserByUsername } from '../../../services/actions/users';
+import { useUser } from '../../../context/UserContext'
 
 const LoginForm = () => {
+  const { login } = useUser();
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const navigate = useNavigate(); // Instanciando o hook de navegação
+  const navigate = useNavigate();
 
-  const onFinish = async (data) => {
+  const getToken = async (data) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/token/', {
-        username: data.email,
+      const response = await createToken({
+        username: data.username,
         password: data.password
       });
 
-      if (response.status === 200) {
-        localStorage.setItem('token', response.data.token); // Salva o token
-        navigate('/dashboard'); // Redireciona para a página do dashboard
+      if (response && response.status === 200) {
+        localStorage.setItem('token', response.data.access);
+        return response.data.access
       }
     } catch (error) {
       console.error('Erro ao fazer login:', error);
     }
+  }
+
+  const onFinish = async (data) => {
+    try {
+      const token = await getToken(data);
+
+      const userData = await getUserByUsername(data.username, token);
+      console.log("userData:", userData)
+      
+      if(userData && userData.status === 200) {
+        login(userData.data);
+        navigate(`/dashboard/${userData.data.id}`)
+        return userData.data;
+      }
+      
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+    }
+   
   };
 
   const onFinishFailed = (errorInfo) => {

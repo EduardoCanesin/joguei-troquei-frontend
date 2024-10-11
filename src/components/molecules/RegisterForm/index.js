@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Form, Input, Button, DatePicker, Row, Col, message } from 'antd';
-import { ErrorMessage } from '@hookform/error-message';
-import axios from 'axios';
+import { Form, Input, Button, DatePicker, message } from 'antd';
 import moment from 'moment';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { createNewUser } from '../../../services/actions/users';
 
-// Styled Components
 const StyledForm = styled(Form)`
   max-width: 600px;
   margin: 0 auto;
@@ -28,7 +26,6 @@ const ErrorText = styled.p`
   margin: 0;
 `;
 
-// Layout para as labels e inputs
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
@@ -46,175 +43,204 @@ const RegistrationForm = () => {
   const navigate = useNavigate();
   const password = watch('password');
 
-  // Mensagens de sucesso e erro
   const [messageApi, contextHolder] = message.useMessage();
 
   const onSubmit = async (data) => {
-    try {
-      // Enviar dados ao backend
-      const response = await axios.post('/api/v1/register', data); // Ajuste a rota conforme o backend
-      messageApi.success('Cadastro realizado com sucesso! Redirecionando para o login...');
-      // Limpar o formulário após o sucesso
-      reset();
+    const { confirmPassword, ...formData } = data;
 
-      // Redireciona para a página de login após 2 segundos
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+    const payload = {
+      ...formData,
+      status: true,
+    };
+
+    try {
+      const response = await createNewUser(payload);
+      if(response && response.status === 201) {
+        messageApi.success('Cadastro realizado com sucesso! Redirecionando para o login...');
+        reset();
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
+      }
     } catch (error) {
       messageApi.error('Erro ao cadastrar usuário. Tente novamente.');
       console.error('Erro ao cadastrar usuário', error.response?.data || error.message);
     }
   };
 
-  // Função para formatar a data de nascimento
   const handleDateChange = (date, dateString) => {
-    setValue('birthDate', dateString);
+    setValue('date_of_birth', dateString);
   };
 
-  return (
-    <>
-      {contextHolder}
-      <StyledForm
-        {...layout}
-        onFinish={handleSubmit(onSubmit)}
-        aria-label="Formulário de Cadastro"
+  const handleFirstNameChange = (event) => {
+    setValue('first_name', event.target.value);
+  };
+
+  const handleLastNameChange = (event) => {
+    setValue('last_name', event.target.value);
+  };
+  
+  const handleStateChange = (event) => {
+    setValue('state', event.target.value);
+  };
+
+  const handleCityChange = (event) => {
+    setValue('city', event.target.value);
+  };
+
+  const handleEmailChange = (event) => {
+    setValue('username', event.target.value);
+  };
+
+  const handlePasswordChange = (event) => {
+    setValue('password', event.target.value);
+  };
+
+  const handleConfirmPasswordChange = (event) => {
+    setValue('confirmPassword', event.target.value);
+  }; 
+
+return (
+  <>
+    {contextHolder}
+    <StyledForm
+      {...layout}
+      onFinish={handleSubmit(onSubmit)}
+      aria-label="Formulário de Cadastro"
+    >
+      {/* Nome */}
+      <Form.Item
+        label="Nome"
+        onChange={handleFirstNameChange}
+        rules={[{ required: true, message: 'O nome é obrigatório.' }]}
+        >
+        <Input
+          {...register('first_name', { required: true })}
+          aria-invalid={errors.first_name ? 'true' : 'false'}
+          placeholder="Digite seu nome"
+        />
+        {errors.first_name && <ErrorText>{errors.first_name.message}</ErrorText>}
+      </Form.Item>
+
+      {/* Sobrenome */}
+      <Form.Item
+        label="Sobrenome"
+        onChange={handleLastNameChange}
+        rules={[{ required: true, message: 'O sobrenome é obrigatório.' }]}
       >
-        {/* Nome */}
-        <Form.Item
-          label="Nome"
-          validateStatus={errors.firstName ? 'error' : ''}
-          help={errors.firstName?.message}
-        >
-          <Input
-            {...register('firstName', { required: 'Nome é obrigatório' })}
-            aria-invalid={errors.firstName ? 'true' : 'false'}
-            placeholder="Digite seu nome"
-          />
-          <ErrorMessage errors={errors} name="firstName" as={<ErrorText />} />
-        </Form.Item>
+        <Input
+          {...register('last_name', { required: true })}
+          aria-invalid={errors.last_name ? 'true' : 'false'}
+          placeholder="Digite seu sobrenome"
+        />
+        {errors.last_name && <ErrorText>{errors.last_name.message}</ErrorText>}
+      </Form.Item>
 
-        {/* Sobrenome */}
-        <Form.Item
-          label="Sobrenome"
-          validateStatus={errors.lastName ? 'error' : ''}
-          help={errors.lastName?.message}
-        >
-          <Input
-            {...register('lastName', { required: 'Sobrenome é obrigatório' })}
-            aria-invalid={errors.lastName ? 'true' : 'false'}
-            placeholder="Digite seu sobrenome"
-          />
-          <ErrorMessage errors={errors} name="lastName" as={<ErrorText />} />
-        </Form.Item>
+      {/* Estado */}
+      <Form.Item
+        label="Estado"
+        onChange={handleStateChange}
+        rules={[{ required: true, message: 'O estado é obrigatório.' }]}
+      >
+        <Input
+          {...register('state', { required: true })}
+          aria-invalid={errors.state ? 'true' : 'false'}
+          placeholder="Digite seu estado"
+        />
+        {errors.state && <ErrorText>{errors.state.message}</ErrorText>}
+      </Form.Item>
 
-        {/* Estado */}
-        <Form.Item
-          label="Estado"
-          validateStatus={errors.state ? 'error' : ''}
-          help={errors.state?.message}
-        >
-          <Input
-            {...register('state', { required: 'Estado é obrigatório' })}
-            aria-invalid={errors.state ? 'true' : 'false'}
-            placeholder="Digite seu estado"
-          />
-          <ErrorMessage errors={errors} name="state" as={<ErrorText />} />
-        </Form.Item>
+      {/* Cidade */}
+      <Form.Item
+        label="Cidade"
+        onChange={handleCityChange}
+        rules={[{ required: true, message: 'A cidade é obrigatória.' }]}
+      >
+        <Input
+          {...register('city', { required: true })}
+          aria-invalid={errors.city ? 'true' : 'false'}
+          placeholder="Digite sua cidade"
+        />
+        {errors.city && <ErrorText>{errors.city.message}</ErrorText>}
+      </Form.Item>
 
-        {/* Cidade */}
-        <Form.Item
-          label="Cidade"
-          validateStatus={errors.city ? 'error' : ''}
-          help={errors.city?.message}
-        >
-          <Input
-            {...register('city', { required: 'Cidade é obrigatória' })}
-            aria-invalid={errors.city ? 'true' : 'false'}
-            placeholder="Digite sua cidade"
-          />
-          <ErrorMessage errors={errors} name="city" as={<ErrorText />} />
-        </Form.Item>
+      {/* Data de Nascimento */}
+      <Form.Item
+        label="Data de Nascimento"
+        rules={[{ required: true, message: 'A data de nascimento é obrigatória.' }]}
+      >
+        <StyledDatePicker
+          onChange={handleDateChange}
+          aria-invalid={errors.date_of_birth ? 'true' : 'false'}
+          placeholder="Selecione sua data de nascimento"
+          disabledDate={(current) => current && current > moment().endOf('day')}
+        />
+        <input
+          type="hidden"
+          {...register('date_of_birth', { required: true })}
+        />
+        {errors.date_of_birth && <ErrorText>{errors.date_of_birth.message}</ErrorText>}
+      </Form.Item>
 
-        {/* Data de Nascimento */}
-        <Form.Item
-          label="Data de Nascimento"
-          validateStatus={errors.birthDate ? 'error' : ''}
-          help={errors.birthDate?.message}
-        >
-          <StyledDatePicker
-            onChange={handleDateChange}
-            aria-invalid={errors.birthDate ? 'true' : 'false'}
-            placeholder="Selecione sua data de nascimento"
-            disabledDate={(current) => current && current > moment().endOf('day')}
-          />
-          <input
-            type="hidden"
-            {...register('birthDate', { required: 'Data de nascimento é obrigatória' })}
-          />
-          <ErrorMessage errors={errors} name="birthDate" as={<ErrorText />} />
-        </Form.Item>
+      {/* Email */}
+      <Form.Item
+        label="Email"
+        onChange={handleEmailChange}
+        rules={[{ required: true, message: 'O email é obrigatório.' }]}
+      >
+        <Input
+          {...register('username', { required: true }, {
+            pattern: {
+              value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
+              message: 'Formato de email inválido',
+            },
+          })}
+          aria-invalid={errors.username ? 'true' : 'false'}
+          placeholder="Digite seu email"
+        />
+        {errors.username && <ErrorText>{errors.username.message}</ErrorText>}
+      </Form.Item>
 
-        {/* Email */}
-        <Form.Item
-          label="Email"
-          validateStatus={errors.email ? 'error' : ''}
-          help={errors.email?.message}
-        >
-          <Input
-            {...register('email', {
-              required: 'Email é obrigatório',
-              pattern: {
-                value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
-                message: 'Formato de email inválido',
-              },
-            })}
-            aria-invalid={errors.email ? 'true' : 'false'}
-            placeholder="Digite seu email"
-          />
-          <ErrorMessage errors={errors} name="email" as={<ErrorText />} />
-        </Form.Item>
+      {/* Senha */}
+      <Form.Item
+        label="Senha"
+        onChange={handlePasswordChange}
+        rules={[{ required: true, message: 'A senha é obrigatória.' }]}
+      >
+        <Input.Password
+          {...register('password', { required: true })}
+          aria-invalid={errors.password ? 'true' : 'false'}
+          placeholder="Digite sua senha"
+        />
+        {errors.password && <ErrorText>{errors.password.message}</ErrorText>}
+      </Form.Item>
 
-        {/* Senha */}
-        <Form.Item
-          label="Senha"
-          validateStatus={errors.password ? 'error' : ''}
-          help={errors.password?.message}
-        >
-          <Input.Password
-            {...register('password', { required: 'Senha é obrigatória' })}
-            aria-invalid={errors.password ? 'true' : 'false'}
-            placeholder="Digite sua senha"
-          />
-          <ErrorMessage errors={errors} name="password" as={<ErrorText />} />
-        </Form.Item>
+      {/* Confirmar Senha */}
+      <Form.Item
+        label="Confirmar Senha"
+        onChange={handleConfirmPasswordChange}
+        rules={[{ required: true, message: 'A confirmação da senha é obrigatória.' }]}
+      >
+        <Input.Password
+          {...register('confirmPassword', { required: true }, {
+            validate: (value) => value === watch('password') || 'As senhas não coincidem',
+          })}
+          aria-invalid={errors.confirmPassword ? 'true' : 'false'}
+          placeholder="Confirme sua senha"
+        />
+        {errors.confirmPassword && <ErrorText>{errors.confirmPassword.message}</ErrorText>}
+      </Form.Item>
 
-        {/* Confirmar Senha */}
-        <Form.Item
-          label="Confirmar Senha"
-          validateStatus={errors.confirmPassword ? 'error' : ''}
-          help={errors.confirmPassword?.message}
-        >
-          <Input.Password
-            {...register('confirmPassword', {
-              required: 'Confirmar senha é obrigatório',
-              validate: (value) => value === password || 'As senhas não coincidem',
-            })}
-            aria-invalid={errors.confirmPassword ? 'true' : 'false'}
-            placeholder="Confirme sua senha"
-          />
-          <ErrorMessage errors={errors} name="confirmPassword" as={<ErrorText />} />
-        </Form.Item>
+      {/* Botão de Cadastro */}
+      <Form.Item wrapperCol={{ span: 24, offset: 8 }}>
+        <StyledButton type="primary" htmlType="submit">
+          Cadastrar
+        </StyledButton>
+      </Form.Item>
+    </StyledForm>
+  </>
+);
 
-        {/* Botão de Cadastro */}
-        <Form.Item wrapperCol={{ span: 24, offset: 8 }}>
-          <StyledButton type="primary" htmlType="submit">
-            Cadastrar
-          </StyledButton>
-        </Form.Item>
-      </StyledForm>
-    </>
-  );
 };
 
 export default RegistrationForm;

@@ -2,7 +2,6 @@ import React from 'react';
 import { Menu } from 'antd';
 import styled from 'styled-components';
 
-// Styled Components para o menu
 const SidebarContainer = styled.div`
   width: 250px;
   height: 100vh;
