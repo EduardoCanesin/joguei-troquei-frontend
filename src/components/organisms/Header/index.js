@@ -86,14 +86,6 @@ const AppHeader = ({ onLoginClick }) => {
                 <HomeOutlined style={{ color: 'white', fontSize: '24px' }} role="img" aria-hidden="false" />
               </IconButton>
 
-              {/* Ícone Logout */}
-              <IconButton
-                onClick={handleLogout}
-                aria-label="Sair"
-              >
-                <LogoutOutlined style={{ color: 'white', fontSize: '24px' }} role="img" aria-hidden="false" />
-              </IconButton>
-
               {/* Ícone de Perfil com Dropdown */}
               <ProfileMenuWrapper>
                 <IconButton
@@ -127,6 +119,14 @@ const AppHeader = ({ onLoginClick }) => {
                   />
                 )}
               </ProfileMenuWrapper>
+
+              {/* Ícone Logout */}
+              <IconButton
+                onClick={handleLogout}
+                aria-label="Sair"
+              >
+                <LogoutOutlined style={{ color: 'white', fontSize: '24px' }} role="img" aria-hidden="false" />
+              </IconButton>
             </>
           ) : (
             <IconButton

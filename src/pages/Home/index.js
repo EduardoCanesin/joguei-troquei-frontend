@@ -1,4 +1,3 @@
-// Home.js
 import React, { useRef } from 'react';
 import { Layout } from 'antd';
 import styled from 'styled-components';

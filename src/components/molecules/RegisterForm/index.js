@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Form, Input, Button, DatePicker, message } from 'antd';
 import moment from 'moment';
@@ -41,7 +41,6 @@ const RegistrationForm = () => {
     reset,
   } = useForm();
   const navigate = useNavigate();
-  const password = watch('password');
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -68,7 +67,7 @@ const RegistrationForm = () => {
     }
   };
 
-  const handleDateChange = (date, dateString) => {
+  const handleDateChange = (dateString) => {
     setValue('date_of_birth', dateString);
   };
 

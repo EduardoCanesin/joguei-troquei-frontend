@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { List, Modal, Typography, message } from 'antd';
 import styled from 'styled-components';
 import { DeleteOutlined, SwapOutlined } from '@ant-design/icons';
+import { deleteGameFromCollection, getCollection, updateTradeStatus } from '../../../services/actions/games';
+import getToken from '../../../utils/getToken';
 
 const { Title } = Typography;
 
@@ -25,16 +27,18 @@ const EmptyMessage = styled.div`
 `;
 
 const MyCollection = () => {
-  const [games, setGames] = useState([]);
+  const [collection, setCollection] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const token = getToken();
   
   useEffect(() => {
     const fetchCollection = async () => {
       try {
-        const response = await fetch('/api/collection'); // Endpoint para obter jogos da coleção
-        if (!response.ok) throw new Error('Erro ao carregar a coleção');
+        const response = await getCollection(token)
+        //if (!response) throw new Error('Erro ao carregar a coleção');
         const data = await response.json();
-        setGames(data);
+        setCollection(data);
       } catch (error) {
         message.error(error.message);
       } finally {
@@ -45,46 +49,50 @@ const MyCollection = () => {
     fetchCollection();
   }, []);
 
-  const handleDeleteGame = async (gameId) => {
+  const handleDeleteGame = async (collectionId) => {
     try {
-      const response = await fetch(`/api/collection/${gameId}`, {
-        method: 'DELETE',
-      });
+      const response = await deleteGameFromCollection(collectionId, token);
 
       if (!response.ok) throw new Error('Erro ao excluir o jogo da coleção');
 
       message.success('Jogo excluído com sucesso.');
-      setGames(games.filter(game => game.id !== gameId));
+      setCollection(collection.filter(game => game.id !== collectionId));
     } catch (error) {
       message.error(error.message);
     }
   };
 
-  const handleAddToSwap = async (gameId) => {
+  const handleAddToTradeList = async (collectionId) => {
     try {
-      const response = await fetch('/api/swap', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ gameId }),
-      });
-
-      if (!response.ok) throw new Error('Erro ao adicionar o jogo à lista de troca');
-
-      message.success('Jogo adicionado à lista de troca com sucesso.');
+      const response = await updateTradeStatus(collectionId, token);
+      if (response.ok) {
+        message.success("Jogo adicionado à lista de troca com sucesso.");
+      } else {
+        throw new Error("Erro ao adicionar o jogo à lista de troca.");
+      }
     } catch (error) {
       message.error(error.message);
     }
   };
 
-  const confirmDelete = (gameId) => {
+  
+  const confirmDelete = (collectionId) => {
     Modal.confirm({
       title: 'Tem certeza que deseja excluir este jogo da sua coleção?',
-      onOk: () => handleDeleteGame(gameId),
+      onOk: () => handleDeleteGame(collectionId),
       okText: 'Sim',
       cancelText: 'Não',
       okType: 'danger',
+    });
+  };
+  
+  const confirmAddToTradeList = (collectionId, gameName) => {
+    Modal.confirm({
+      title: `Tem certeza que deseja adicionar ${gameName} à lista de troca?`,
+      onOk: () => handleAddToTradeList(collectionId),
+      okText: "Sim",
+      cancelText: "Não",
+      okType: "primary",
     });
   };
 
@@ -95,14 +103,14 @@ const MyCollection = () => {
         <p>Carregando...</p>
       ) : (
         <>
-          {games.length === 0 ? (
+          {collection.length === 0 ? (
             <EmptyMessage role="alert" aria-live="assertive">
               Você não possui jogos na sua coleção. Adicione alguns para começar!
             </EmptyMessage>
           ) : (
             <List
               itemLayout="horizontal"
-              dataSource={games}
+              dataSource={collection}
               renderItem={item => (
                 <List.Item
                   actions={[
@@ -110,14 +118,14 @@ const MyCollection = () => {
                       onClick={() => confirmDelete(item.id)} 
                       aria-label={`Excluir ${item.name} da coleção`} 
                     />,
-                    <SwapOutlined 
-                      onClick={() => handleAddToSwap(item.id)} 
-                      aria-label={`Adicionar ${item.name} à lista de troca`} 
+                    <SwapOutlined
+                      onClick={() => confirmAddToTradeList(item.id, item.name)}
+                      aria-label={`Adicionar ${item.name} à lista de troca`}
                     />,
                   ]}
                 >
                   <List.Item.Meta
-                    title={<a href={`/games/${item.id}`} aria-label={`Ver detalhes do jogo ${item.name}`}>{item.name}</a>}
+                    title={<a href={`/game-info/${item.id}`} aria-label={`Ver detalhes do jogo ${item.name}`}>{item.name}</a>}
                     description={<GameImage src={item.imageUrl} alt={item.name} />}
                   />
                 </List.Item>
