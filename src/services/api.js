@@ -29,13 +29,14 @@ const apiRoutes = {
   
     // deleteUser: (userId) => axios.delete(`/${userId}/`)
   },
-  games: {
-    getGamesList: () => axios.get('/bomb/games'),
+  bomb: {
+    getGamesList: (page) => axios.get(`/bomb/games/?page=${page}`),
 
     getPlatforms: () => axios.get('/bomb/platforms'),
 
-    searchGames: () => axios.get('/bomb/search'),
-
+    searchGames: (platform, game) => axios.get(`/bomb/search/?platforms=${platform}&query=${game}`),
+  },
+  collection: {
     getCollection: (token) => axios.get('/collection/', {
       headers: {
         Authorization: `Bearer ${token}`,

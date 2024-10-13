@@ -67,7 +67,7 @@ const RegistrationForm = () => {
     }
   };
 
-  const handleDateChange = (dateString) => {
+  const handleDateChange = (date, dateString) => {
     setValue('date_of_birth', dateString);
   };
 

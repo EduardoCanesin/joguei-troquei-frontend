@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { List, Modal, Typography, message } from 'antd';
 import styled from 'styled-components';
 import { DeleteOutlined, SwapOutlined } from '@ant-design/icons';
-import { deleteGameFromCollection, getCollection, updateTradeStatus } from '../../../services/actions/games';
+import { deleteGameFromCollection, getCollection, updateTradeStatus } from '../../../services/actions/collection';
 import getToken from '../../../utils/getToken';
 
 const { Title } = Typography;

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Select, Button, message } from 'antd';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Input, Select, Button, message } from 'antd';
 import styled from 'styled-components';
-import SearchResults from '../SearchResults'; // Importando o componente de resultados
+import SearchResults from '../SearchResults';
+import { getGamesList, getPlatforms, searchGames } from '../../../services/actions/bomb';
 
 const { Option } = Select;
 
-// Styled Components
 const SearchContainer = styled.div`
   background-color: white;
   padding: 20px;
@@ -27,15 +27,18 @@ const SearchComponent = () => {
   const [games, setGames] = useState([]);
   const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
-  const [searchResults, setSearchResults] = useState([]); // Estado para os resultados da busca
+  const [searchResults, setSearchResults] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true); 
 
+  console.log("jogos:", games)
   // Carregar plataformas do backend
   useEffect(() => {
     const fetchPlatforms = async () => {
       try {
-        const response = await fetch('/api/platforms');
-        const data = await response.json();
-        setPlatforms(data);
+        const response = await getPlatforms();
+        setPlatforms(response.data);
       } catch (error) {
         message.error('Erro ao carregar plataformas');
       }
@@ -44,35 +47,49 @@ const SearchComponent = () => {
     fetchPlatforms();
   }, []);
 
-  // Carregar jogos do backend
-  useEffect(() => {
-    const fetchGames = async () => {
-      try {
-        const response = await fetch('/api/games');
-        const data = await response.json();
-        setGames(data);
-      } catch (error) {
-        message.error('Erro ao carregar jogos');
+  const fetchGames = useCallback(async (page) => {
+    try {
+      setLoading(true);
+      const response = await getGamesList(page);
+      if (!response) {
+        setHasMore(false);
+      } else {
+        setGames((prevGames) => [...prevGames, ...response]);
       }
-    };
-
-    fetchGames();
+    } catch (error) {
+      message.error('Erro ao carregar jogos');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!loading && hasMore) {
+      fetchGames(page);
+    }
+  }, [page, hasMore, fetchGames]);
+
+
+  const handlePopupScroll = (event) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    if (scrollTop + clientHeight >= scrollHeight - 10 && !loading && hasMore) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
 
   // Manipulação do botão de busca
   const handleSearch = async () => {
-    if (!selectedPlatform || !selectedGame) {
-      message.error('Por favor, selecione a plataforma e o nome do jogo');
-      return;
-    }
+    // if (!selectedPlatform || !selectedGame) {
+    //   message.error('Por favor, selecione a plataforma e o nome do jogo');
+    //   return;
+    // }
 
     try {
-      const response = await fetch(`/api/search?platform=${selectedPlatform}&game=${selectedGame}`);
-      if (!response.ok) {
+      const response = await searchGames(selectedPlatform, selectedGame);
+      if (!response) {
         throw new Error('Erro ao buscar jogos');
       }
-      const result = await response.json();
-      setSearchResults(result); // Armazenar os resultados da busca
+      setSearchResults(response.results);
 
       message.success('Busca realizada com sucesso!');
     } catch (error) {
@@ -89,14 +106,14 @@ const SearchComponent = () => {
           onChange={setSelectedPlatform}
           aria-label="Selecionar Plataforma"
         >
-          {platforms.map(platform => (
+          {platforms && platforms.map(platform => (
             <Option key={platform.id} value={platform.name}>
               {platform.name}
             </Option>
           ))}
         </Select>
 
-        <Select
+        {/* <Select
           placeholder="Digite o nome do jogo"
           style={{ width: '100%', marginBottom: '10px' }}
           onChange={setSelectedGame}
@@ -104,14 +121,25 @@ const SearchComponent = () => {
           filterOption={(input, option) =>
             option.children.toLowerCase().includes(input.toLowerCase())
           }
+          onPopupScroll={handlePopupScroll}
+          loading={loading}
           aria-label="Selecionar Nome do Jogo"
         >
-          {games.map(game => (
+          {games && games.map((game) => (
             <Option key={game.id} value={game.name}>
               {game.name}
             </Option>
           ))}
-        </Select>
+        </Select> */}
+
+        {/* Input para o nome do jogo */}
+        <Input
+          placeholder="Digite o nome do jogo"
+          style={{ width: '100%', marginBottom: '10px' }}
+          value={selectedGame}  // Vincular o valor do input ao estado
+          onChange={(e) => setSelectedGame(e.target.value)}  // Atualiza o estado ao digitar
+          aria-label="Digite o nome do jogo"
+        />
 
         <StyledButton type="primary" onClick={handleSearch}>
           Buscar
