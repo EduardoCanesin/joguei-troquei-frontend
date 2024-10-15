@@ -8,7 +8,7 @@ const BannerContainer = styled.div`
   align-items: center;
   height: 100vh;
   padding: 20px;
-  background: ${({ gradient }) => (gradient ? 'linear-gradient(to right, #1D284C, #4E5B82)' : '#fff')};
+  background: ${({ gradient }) => (gradient ? 'linear-gradient(to right, #1D284C 50%, #445EB2 100%)' : '#fff')};
 `;
 
 const TextContainer = styled.div`

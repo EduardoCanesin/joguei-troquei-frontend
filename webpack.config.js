@@ -12,30 +12,42 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,   // Processa arquivos JS e JSX
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
         },
       },
       {
-        test: /\.css$/,   // Para incluir arquivos CSS
+        test: /\.css$/,
         use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'assets/images/',
+            },
+          },
+        ],
       },
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsx'],  // Permite usar .js e .jsx sem especificar
+    extensions: ['.js', '.jsx'],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html',  // Gera o HTML que carrega o React
+      template: './src/index.html',
     }),
   ],
   devServer: {
-    static: path.resolve(__dirname, 'dist'),  // Diretório dos arquivos estáticos
-    historyApiFallback: true,  // Redireciona todas as requisições para o index.html
-    port: 3000,  // Porta do servidor de desenvolvimento
-    open: true,  // Abre o navegador automaticamente  },
+    static: path.resolve(__dirname, 'dist'),
+    historyApiFallback: true,
+    port: 3000,
+    open: true,
   }
 };

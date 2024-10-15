@@ -5,16 +5,11 @@ import moment from 'moment';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { createNewUser } from '../../../services/actions/users';
+import CustomButton from '../../atoms/Button';
 
 const StyledForm = styled(Form)`
   max-width: 600px;
   margin: 0 auto;
-`;
-
-const StyledButton = styled(Button)`
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
 `;
 
 const StyledDatePicker = styled(DatePicker)`
@@ -25,11 +20,6 @@ const ErrorText = styled.p`
   color: red;
   margin: 0;
 `;
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
 
 const RegistrationForm = () => {
   const {
@@ -103,22 +93,22 @@ return (
   <>
     {contextHolder}
     <StyledForm
-      {...layout}
       onFinish={handleSubmit(onSubmit)}
       aria-label="Formulário de Cadastro"
+      layout="vertical"
     >
       {/* Nome */}
       <Form.Item
         label="Nome"
         onChange={handleFirstNameChange}
         rules={[{ required: true, message: 'O nome é obrigatório.' }]}
-        >
+      >
         <Input
-          {...register('first_name', { required: true })}
+          // {...register('first_name', { required: true })}
           aria-invalid={errors.first_name ? 'true' : 'false'}
           placeholder="Digite seu nome"
         />
-        {errors.first_name && <ErrorText>{errors.first_name.message}</ErrorText>}
+        {/* {errors.first_name && <ErrorText>{errors.first_name.message}</ErrorText>} */}
       </Form.Item>
 
       {/* Sobrenome */}
@@ -231,10 +221,8 @@ return (
       </Form.Item>
 
       {/* Botão de Cadastro */}
-      <Form.Item wrapperCol={{ span: 24, offset: 8 }}>
-        <StyledButton type="primary" htmlType="submit">
-          Cadastrar
-        </StyledButton>
+      <Form.Item style={{display:'flex', justifyContent: 'center'}} >
+        <CustomButton text="Cadastrar" htmlType="submit" />
       </Form.Item>
     </StyledForm>
   </>

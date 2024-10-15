@@ -2,14 +2,20 @@ import React, { useState } from 'react';
 import { Layout, Menu, Avatar } from 'antd';
 import { UserOutlined, HomeOutlined, LogoutOutlined, LoginOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import logo from '../../../assets/images/header_logo.svg';
+import useIsHome from '../../../hooks/useIsHome';
 import styled from 'styled-components';
 
 const { Header } = Layout;
 
-// Styled Components
 const StyledHeader = styled(Header)`
   background-color: #1D284C;
-  padding: 0 20px;
+  padding: 10px 10px;
+
+    &.ant-layout-header {
+    height: ${({ isHome }) => (isHome ? '64px' : '44px')};
+    line-height: ${({ isHome }) => (isHome ? '64px' : '44px')};
+  }
 `;
 
 const Logo = styled.img`
@@ -51,6 +57,8 @@ const ProfileMenu = styled(Menu)`
 const AppHeader = ({ onLoginClick }) => {
   const navigate = useNavigate();
   const [menuVisible, setMenuVisible] = useState(false);
+  const isHome = useIsHome();
+
 
   // Verifica se o usuário está logado
   const isLoggedIn = Boolean(localStorage.getItem('token'));
@@ -71,10 +79,9 @@ const AppHeader = ({ onLoginClick }) => {
   };
 
   return (
-    <StyledHeader>
+    <StyledHeader isHome={isHome}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Logo src="/path/to/logo.png" alt="Logotipo da empresa" />
-
+        <Logo src={logo} alt="Logotipo Joguei Troquei" />
         <HeaderRight>
           {isLoggedIn ? (
             <>

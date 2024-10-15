@@ -15,7 +15,7 @@ const RegistrationContainer = styled.div`
   min-height: 100vh; /* Garante que a página ocupe a altura total da tela */
 `;
 
-const RegistrationTitle = styled.h1`
+const RegistrationTitle = styled.h3`
   margin-bottom: 20px;
   color: #1d284c; /* Cor do título */
 `;

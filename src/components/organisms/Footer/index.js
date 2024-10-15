@@ -1,13 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
+import logo from '../../../assets/images/footer_logo.svg'
 
-// Styled Components para o Footer
 const FooterContainer = styled.footer`
   background-color: #1D284C;
-  height: 70px;
+  height: 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  place-content: flex-end;
   padding: 0 20px;
   color: white;
 `;
@@ -19,14 +20,14 @@ const FooterText = styled.p`
 `;
 
 const Logo = styled.img`
-  height: 40px;
+  height: 35px;
 `;
 
 const Footer = () => {
   return (
     <FooterContainer role="contentinfo" aria-label="Rodapé do site">
       {/* <FooterText aria-label="Desenvolvido por ">Desenvolvido por </FooterText> */}
-      <Logo src="/path/to/logo.png" alt="Logotipo do site Joguei Troquei" />
+      <Logo src={logo} alt="Logotipo do site Joguei Troquei" />
     </FooterContainer>
   );
 };

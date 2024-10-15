@@ -6,14 +6,27 @@ import Banner from '../../components/atoms/Banner';
 import LoginForm from '../../components/molecules/LoginForm';
 import Footer from '../../components/organisms/Footer';
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'antd';
-// import bannerImageLeft from './path/to/your/left-image.png'; // substitua pelo caminho correto
+import CustomButton from '../../components/atoms/Button';
+import bannerImageLeft from '../../assets/images/logo.svg';
 // import bannerImageRight from './path/to/your/right-image.png'; // substitua pelo caminho correto
 
 const { Content } = Layout;
 
 const HomeContainer = styled(Layout)`
   min-height: 100vh;
+`;
+
+const StyledParticipate = styled.div`
+display: flex;
+    justify-content: center;
+    padding-bottom: 50px;
+    background-color: white;
+`;
+
+const StyledLogin = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 `;
 
 const Home = () => {
@@ -36,7 +49,7 @@ const Home = () => {
       <Content>
         <Banner
           text="Bem-vindo ao Joguei Troquei!"
-          // image={bannerImageLeft}
+          image={bannerImageLeft}
           gradient={true}
         />
         <Banner
@@ -44,14 +57,13 @@ const Home = () => {
           // image={bannerImageRight}
           gradient={false}
         />
-        <div>
-          <Button type="primary" onClick={handleParticiparClick}>
-            Participar
-          </Button>
-        </div>
-        <div ref={loginFormRef} id='login-form'>
+        <StyledParticipate>
+          <CustomButton text="Participar" onClick={handleParticiparClick} />
+        </StyledParticipate>
+        <StyledLogin ref={loginFormRef} id='login-form'>
+          <h3>Faça o seu Login</h3>
           <LoginForm />
-        </div>
+        </StyledLogin>
       </Content>
       <Footer />
     </HomeContainer>
